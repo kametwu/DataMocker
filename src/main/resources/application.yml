@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: DataMocker
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    platform: sqlite
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite::resource:datamocker.db?date_string_format=yyyy-MM-dd HH:mm:ss
+    username: null
+    password: null
+    
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
