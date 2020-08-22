@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.kametwu</groupId>
 	<artifactId>DataMocker</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>DataMocker</name>
 	<description>DataMocker</description>
 
@@ -72,23 +72,129 @@
 			<version>8.2.2.jre8</version>
 		</dependency>
 
+		<!-- DB2驱动不能从中央仓库获取,是自己上传到nexus的第三方仓库的 -->
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>db2</artifactId>
-			<version>1.14.3</version>
-			<scope>test</scope>
+			<groupId>com.ibm.db2</groupId>
+			<artifactId>db2jcc4</artifactId>
+			<version>4.21.29</version>
+		</dependency>
+
+		<!-- PostgreSQL驱动 -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+
+		<!-- GreenPlum驱动 -->
+		<dependency>
+			<groupId>com.pivotal</groupId>
+			<artifactId>greenplum</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<!-- Teradata的数据库驱动 -->
+		<dependency>
+			<groupId>com.teradata</groupId>
+			<artifactId>terajdbc4</artifactId>
+			<version>12.0.0.110</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.teradata</groupId>
+			<artifactId>tdgssconfig</artifactId>
+			<version>12.0.0.110</version>
+		</dependency>
+		<!--hive驱动包，包含hive-jdbc，hive-service， hive-service-rpc，libthrift，由于hive中引的包实在太多，所以过滤掉，自己手动引用 -->
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-jdbc</artifactId>
+			<version>2.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!--由于hive-jdbc中使用到了commons-lang包，因此这里单独引入一下。 -->
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-service</artifactId>
+			<version>2.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.hive</groupId>
+					<artifactId>hive-service-rpc</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.hive</groupId>
+					<artifactId>hive-exec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.hive</groupId>
+					<artifactId>hive-metastore</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.curator</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sf.jpam</groupId>
+					<artifactId>jpam</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.jamon</groupId>
+					<artifactId>jamon-runtime</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty.aggregate</groupId>
+					<artifactId>jetty-all</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.hive</groupId>
+					<artifactId>hive-llap-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>tomcat</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-exec</artifactId>
+			<version>2.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-service-rpc</artifactId>
+			<version>2.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.10.6</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>42.2.14</version>
 		</dependency>
 
 		<!-- 支持热部署 -->

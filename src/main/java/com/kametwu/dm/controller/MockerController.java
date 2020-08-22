@@ -31,7 +31,7 @@ public class MockerController {
 	
 	@PostMapping("/common")
 	public R getCommonData(@RequestBody Table tab) {
-		return R.ok().addData(mockerService.getPreviewData(tab));
+		return R.ok().addData(mockerService.getMockData(tab));
 	}
 	
 	@GetMapping("/custList")

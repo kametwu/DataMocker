@@ -8,6 +8,7 @@ public class Table {
 	private String tableName;
 	private String tableComment;
 	private List<Column> columns;
+	private List<String> columnNames;
 
 	public String getDbSchema() {
 		return dbSchema;
@@ -39,6 +40,14 @@ public class Table {
 
 	public void setColumns(List<Column> columns) {
 		this.columns = columns;
+	}
+
+	public List<String> getColumnNames() {
+		return columnNames;
+	}
+
+	public void setColumnNames(List<String> columnNames) {
+		this.columnNames = columnNames;
 	}
 
 	@Override

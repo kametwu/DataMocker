@@ -52,14 +52,10 @@ public class MockerService {
 	}
 
 	public static void main(String[] args) {
-		MockerService ms = new MockerService();
-		for (int i = 0; i < 100; i++) {
-			System.out.println(ms.getDateForAge(10, 80));
-//			System.out.println(random.nextInt());
-		}
+		System.out.println(new DateTime("1997-06-25T10:31:50"));
 	}
 
-	public List<Map<String, Object>> getPreviewData(Table tab) {
+	public List<Map<String, Object>> getMockData(Table tab) {
 		List<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
 		
 		for(int i = 0; i < DETAULT_PREVIEW_SIZE; i++) {

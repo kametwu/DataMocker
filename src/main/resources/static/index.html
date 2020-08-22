@@ -1,344 +1,383 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>DataMocker</title>
-        <script src="js/index.js" charset="utf-8"></script>
-        <style type="text/css">
-          html, body, #app {
-            font-family: "PingFang SC","Microsoft YaHei","微软雅黑","Helvetica Neue",Helvetica,"Hiragino Sans GB",Arial,sans-serif;
+
+<head>
+    <meta charset="UTF-8">
+    <title>DataMocker</title>
+    <script src="js/index.js" charset="utf-8"></script>
+    <style type="text/css">
+        html, body, #app {
+            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
             font-size: 12px;
             padding: 0;
             margin: 0;
-            height:100%;
-          }
-          
-          .h-con {
-            background-color:#a9d9ac;
+            height: 100%;
+        }
+
+        .h-con {
+            background-color: #a9d9ac;
             margin-bottom: 10px;
-          }
-          
-          .btn-ds-set {
+        }
+
+        .btn-ds-set {
             display: flex;
             justify-content: left;
-            align-items: left;
+            align-items: flex-start;
             margin: 0 0 10px 10px;
-          }
-          
-          .btn-ds-info {
+        }
+
+        .btn-ds-info {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 10px;
-          }
-          
-          .tip-datasource {
+        }
+
+        .tip-datasource {
             width: 98%;
             overflow: hidden;
             text-overflow: ellipsis;
             -o-text-overflow: ellipsis;
             white-space: nowrap;
-          }
-          
-          .f-brandinfo {
+        }
+
+        .f-brandinfo {
             line-height: 35px;
             font-size: 12px;
             color: dimgrey;
             background-color: gainsboro;
-           }
-           
-          .el-table__empty-text {
-            text-align: left;
-           }
-        </style>
-    </head>
-    
-    <body>
-        <div id="app">
-            <el-container style="height:100%;">
-                <el-header class="h-con">
+        }
+    </style>
+</head>
 
+<body>
+<div id="app">
+    <el-container style="height:100%;">
+        <el-header class="h-con">
+        </el-header>
+        <el-container>
+            <el-aside width="200px">
+                <el-row>
+                    <el-col :span="24" class="btn-ds-set">
+                        <el-button :type="btnDSType"
+                                   :loading="btnDSLoading"
+                                   :icon="btnDSIcon"
+                                   size="mini"
+                                   @click="setDataSource()">{{btnDSTitle}}</el-button>
+<!--                        <el-button icon="el-icon-refresh" circle @click="refreshDataSource()"></el-button>-->
+                    </el-col>
+                </el-row>
+<!--                <el-row>-->
+<!--                    <el-col :span="24" class="btn-ds-info">-->
+<!--                        <el-tag type="success" size="mini" class="tip-datasource">{{dataSourceString}}</el-tag>-->
+<!--                    </el-col>-->
+<!--                </el-row>-->
+                <el-row v-for="(tab,idx) in tableList" :key="tab.tableName">
+                    <el-col :span="22">
+                        <el-link :underline="false" @click="handleNodeClick(tab)">{{idx}}.{{tab.tableName}}</el-link>
+                    </el-col>
+                    <el-col :span="2">
+                        <el-link :underline="false" @click="showColumnInfo(tab)"><i class="el-icon-tickets"></i>
+                        </el-link>
+                    </el-col>
+                </el-row>
+            </el-aside>
+            <el-container>
+                <el-header height="35px">
+                    <el-row>
+                        <el-col :span="12" style="display: flex; justify-content: flex-start;">
+                            <el-button type="warning" icon="el-icon-setting" @click="configColumn()">字段配置</el-button>
+                            <el-button type="warning" icon="el-icon-tickets" @click="previewData()">预览数据</el-button>
+                            <el-button type="primary" icon="el-icon-circle-check" @click="saveData()">保存数据</el-button>
+                            <el-button type="primary" icon="el-icon-download" @click="downloadData()">下载数据</el-button>
+                        </el-col>
+                        <el-col :span="12" style="display: flex; justify-content: flex-end;">
+                            <el-button type="text" icon="el-icon-top" @click="importConfig()">导入配置</el-button>
+                            <el-button type="text" icon="el-icon-bottom" @click="exportConfig()">导出配置</el-button>
+                        </el-col>
+                    </el-row>
                 </el-header>
-                <el-container>
-                    <el-aside width="200px">
-                        <el-row>
-                          <el-col :span="24" class="btn-ds-set">
-                            <el-button :type="btnSetDSType" icon="el-icon-coin" circle @click="setDataSource()" :loading="tabLoading"></el-button>
-                            <el-button icon="el-icon-refresh" circle @click="refreshDataSource()"></el-button>
-                          </el-col>
-                        </el-row>
-                        <el-row>
-                          <el-col :span="24" class="btn-ds-info">
-                            <el-tag type="success" size="mini" class="tip-datasource">{{dataSourceString}}</el-tag>
-                          </el-col>
-                        </el-row>
-                        <el-row v-for="(tab,idx) in tableList" :key="tab.tableName">
-                          <el-col :span="22"><el-link :underline="false" @click="handleNodeClick(tab)">{{idx}}.{{tab.tableName}}</el-link></el-col>
-                          <el-col :span="2"><el-link :underline="false" @click="showColumnInfo(tab)"><i class="el-icon-tickets"></i></el-link></el-col>
-                        </el-row>
-                    </el-aside>
-                    <el-container>
-                        <el-header height="35px">
-                            <el-row>
-                                <el-col :span="12" style="display: flex; justify-content: flex-start;">
-                                    <el-button type="warning" icon="el-icon-tickets" @click="previewData()">预览数据</el-button>
-                                    <el-button type="primary" icon="el-icon-circle-check" @click="saveData()">保存数据</el-button>
-                                    <el-button type="primary" icon="el-icon-download" @click="downloadData()">下载数据</el-button>
-                                </el-col>
-                                <el-col :span="12" style="display: flex; justify-content: flex-end;">
-                                    <el-button type="text" icon="el-icon-top" @click="importConfig()">导入配置</el-button>
-                                    <el-button type="text" icon="el-icon-bottom" @click="exportConfig()">导出配置</el-button>
-                                </el-col>
-                            </el-row>
-                        </el-header>
-                        <el-main style="height:0; flex-grow:1;">
-                            <el-table :data="mockData" size="mini" show-overflow-tooltip>
-                              <el-table-column v-for="col in selectedTable.columns" :key="col.columnName" :prop="col.columnName" width="200">
-                                  <template slot="header" slot-scope="scope">
-                                    <span>{{col.columnComment===null||col.columnComment===''?col.columnName:col.columnComment}}</span>
-                                    <el-button type="text" icon="el-icon-setting" @click="setColumn(col)"></el-button>
-                                  </template>
-                              </el-table-column>
-                            </el-table>
-                            <el-drawer :title="columnTitle" :visible.sync="showDrawer">
-                              <span><pre>{{JSON.stringify(selectedColumn, null, 2)}}</pre></span>
-                            </el-drawer>
-                        </el-main>
-                        <el-footer height="35px" class="f-brandinfo">
-                            <span style="float:left">© 2020 Kamet, Wu.</span>
-                            <span style="float:right">字段数：{{selectedTable.columns?selectedTable.columns.length:0}}个，记录数：{{mockData?mockData.length:0}}条</span>
-                        </el-footer>
-                    </el-container>
-                </el-container>
+                <el-main style="height:0; flex-grow:1;">
+                    <el-table :data="mockData" size="mini" show-overflow-tooltip>
+                        <el-table-column v-for="col in selectedTable.columns" :key="col.columnName"
+                                         :prop="col.columnName" :label="col.columnName" width="200">
+                        </el-table-column>
+                    </el-table>
+                </el-main>
+                <el-footer height="35px" class="f-brandinfo">
+                    <span style="float:left">© 2020 Kamet, Wu.</span>
+                    <span style="float:right">字段数：{{selectedTable.columns?selectedTable.columns.length:0}}个，记录数：{{mockData?mockData.length:0}}条</span>
+                </el-footer>
             </el-container>
-            <el-dialog title="数据源" :visible.sync="showDataSourceForm">
-                <el-form :model="dataSource">
-                <el-form-item label="连接名称" label-width="120px">
-                  <el-select v-model="dataSource.title" placeholder="请选择或输入数据源" @change="changeDataSource"
-                             v-if="!newDataSourceFlag" filterable default-first-option>
+        </el-container>
+    </el-container>
+    <el-dialog title="数据源" :visible.sync="showDataSourceForm">
+        <el-form :model="dataSource">
+            <el-form-item label="连接名称" label-width="120px">
+                <el-select v-if="!newDataSourceFlag" v-model="dataSource.title" placeholder="请选择或输入数据源"
+                           @change="changeDataSource" filterable default-first-option>
                     <el-option v-for="(ds,key,idx) in dataSourceList" :key="idx" :label="key" :value="key"></el-option>
-                  </el-select>
-                  <el-input v-if="newDataSourceFlag" v-model="dataSource.title" placeholder="请输入连接名称" autocomplete="off" style="width:300px;"></el-input>
-                  <el-button type="text" :icon="newDataSourceFlag?'':'el-icon-plus'" @click="newDataSource()">{{newDataSourceFlag?'取消':'新建数据源'}}</el-button>
-                </el-form-item>
-                <!-- 
-                <el-form-item label="数据库类型" label-width="120px">
-                  <el-select v-model="dataSource.type" placeholder="请选择数据库类型" @change="changeDBType">
-                    <el-option v-for="(val,key,idx) in dbTypeList" :key="idx" :label="val" :value="key"></el-option>
-                  </el-select>
-                </el-form-item>
-                 -->
-                <el-form-item label="驱动类名称" label-width="120px">
-                  <el-input v-model="dataSource.driver" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="连接字符串" label-width="120px">
-                  <el-input v-model="dataSource.url" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="用户名" label-width="120px">
-                  <el-input v-model="dataSource.username" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="密码" label-width="120px">
-                  <el-input v-model="dataSource.password" autocomplete="off" show-password></el-input>
-                </el-form-item>
-              </el-form>
-              <div slot="footer" class="dialog-footer">
-                <span style="color:red; float:left; margin-left:20px;">数据源配置信息只保存在本地缓存，不上传服务器！</span>
-                <el-button @click="showDataSourceForm=false;newDataSourceFlag=false;">取 消</el-button>
-                <el-button type="danger" @click="delDataSourceConfig()" :disabled="newDataSourceFlag">删 除</el-button>
-                <el-button type="warning" @click="testDataSourceConfig()" :loading="testLoading">测 试</el-button>
-                <el-button type="primary" @click="saveDataSourceConfig()">{{newDataSourceFlag?'保 存':'连 接'}}</el-button>
-              </div>
-            </el-dialog>
-            <el-dialog :title="'字段信息' + (showColumnInfoData[0] ? (' - ' + showColumnInfoData[0].tableName) : '')" :visible.sync="showColumnInfoVisible">
-              <el-table :data="showColumnInfoData" size="mini" height="400">
-                <!-- <el-table-column v-for="(value,colName) in showColumnInfoData[0]" :key="colName" :property="colName" :label="colName" width="150"></el-table-column> -->
-                <el-table-column type="index" label="序号" :index="indexMethod"></el-table-column>
-                <el-table-column property="columnName" label="字段名" width="150"></el-table-column>
-                <el-table-column property="columnComment" label="字段说明" width="150"></el-table-column>
-                <el-table-column property="columnType" label="字段类型" width="150"></el-table-column>
-                <el-table-column property="columnLength" label="字段长度" width="150"></el-table-column>
-              </el-table>
-            </el-dialog>
+                </el-select>
+                <el-input v-if="newDataSourceFlag" v-model="dataSource.title" placeholder="请输入连接名称"
+                          autocomplete="off" style="width:300px;"></el-input>
+                <el-button type="text" :icon="newDataSourceFlag?'':'el-icon-plus'" @click="newDataSource()">
+                    {{newDataSourceFlag?'取消':'新建数据源'}}
+                </el-button>
+            </el-form-item>
+            <el-form-item label="数据库类型" label-width="120px">
+                <el-select v-model="dataSource.type" placeholder="请选择数据库类型" @change="changeDBType">
+                    <el-option v-for="(val,key,idx) in dbTypeList" :key="idx" :label="val.itemName" :value="key"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="驱动类名称" label-width="120px">
+                <el-input v-model="dataSource.driver" autocomplete="off" @input="inputUpdate($event)"></el-input>
+            </el-form-item>
+            <el-form-item label="连接字符串" label-width="120px">
+                <el-input v-model="dataSource.url" autocomplete="off" @input="inputUpdate($event)"></el-input>
+            </el-form-item>
+            <el-form-item label="用户名" label-width="120px">
+                <el-input v-model="dataSource.username" autocomplete="off" @input="inputUpdate($event)"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" label-width="120px">
+                <el-input v-model="dataSource.password" autocomplete="off" show-password></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <span style="color:#ff0000; float:left; margin-left:20px;">数据源配置信息只保存在本地缓存，不上传服务器！</span>
+            <el-button @click="showDataSourceForm=false;newDataSourceFlag=false;">取 消</el-button>
+            <el-button type="danger" @click="delDataSourceConfig()" :disabled="newDataSourceFlag">删 除</el-button>
+            <el-button type="warning" @click="testDataSourceConfig()" :loading="testLoading">测 试</el-button>
+            <el-button type="primary" @click="saveDataSourceConfig()">{{newDataSourceFlag?'保 存':'连 接'}}</el-button>
         </div>
-    </body>
-    
-    <script>
-        Vue.prototype.$ELEMENT = { size: 'small', zIndex: 3000 };
-        new Vue({
-            el: '#app',
-            data() {
-                return {
-                	DataMockerDataKey: '_DataMockerData_',
-                	dataSourceList: {},
-                	newDataSourceFlag: false,
-                	showColumnInfoVisible: false,
-                	showColumnInfoData: [],
-                    showDrawer: false,
-                    tabLoading: false,
-                    testLoading: false,
-                    selectedTable: {},
-                    selectedColumn: {},
-                    mockData: [],
-                    tableList: [],
-                    showDataSourceForm: false,
-                    dataSource: {title: null, driver: null, url: null, username: null, password: null}
-                }
-            },
-            computed: {
-                dataSourceString() {
-                    return this.dataSource.title === null ? '未配置数据源' : `${this.dataSource.username} - ${this.dataSource.url}`;
-                },
-                btnSetDSType() {
-                    return this.dataSource.title === null ? '' : 'primary';
-                },
-                columnTitle() {
-                    return this.selectedColumn.tableName + '.' + this.selectedColumn.columnName + (this.selectedColumn.columnComment ? '（'+this.selectedColumn.columnComment+'）' : '');
-                }
-            },
-            methods: {
-            /* 	changeDBType(dbType) {
-            		var dt = this.dbTypeList[dbType];
-            		console.log(dt);
-            		console.log(this.newDataSourceFlag);
-            		if(this.newDataSourceFlag) {
-            			this.dataSource.driver = dt.attr1;
-                        this.dataSource.url = dt.attr2;
-                        this.dataSource.username = dt.attr4;
-            		}
-            	}, */
-            	indexMethod(index) {
-            		return index + 1;
-            	},
-                setColumn(col) {
-                    this.selectedColumn = col;
-                    this.showDrawer = true;
-                },
-                handleNodeClick(data) {
-                    this.mockData.length = 0;
-                    this.selectedTable = data;
-                },
-                showColumnInfo(tab) {
-                	this.showColumnInfoData = tab.columns;
-                	this.showColumnInfoVisible = true;
-                },
-                changeDataSource(key) {
-            		this.dataSource = Object.assign({},this.dataSourceList[key]);
-                },
-                setDataSource() {
-                    this.showDataSourceForm = true;
-                },
-                newDataSource() {
-                	this.dataSource = {};
-                	this.newDataSourceFlag = !this.newDataSourceFlag;
-                },
-            	saveDataSourceConfig() {
-                	if(this.newDataSourceFlag && this.dataSourceList.hasOwnProperty(this.dataSource.title)) {
-                		this.$message({type: 'warning', message: '该连接名称已存在'});
-                		return;
-                	}
-                	if(util.isNull(this.dataSource.title)) {
-                		this.$message({type: 'warning', message: '连接名称不能为空'});
-                		return;
-                	}
-            		this.dataSourceList[this.dataSource.title] = Object.assign({},this.dataSource);
-            		this.saveDataSourceConfigToLocal();
-                	this.newDataSourceFlag=false;
-                	this.showDataSourceForm = false;
-            		this.getTableList();
-            		if(this.newDataSourceFlag) this.$message({type: 'success', message: '保存成功'});
-            	},
-            	saveDataSourceConfigToLocal() {
-            		var temp = Base64.encode(JSON.stringify(this.dataSourceList));
-            		localStorage.setItem(this.DataMockerDataKey, temp);
-            	},
-            	delDataSourceConfig() {
-            		if(util.isEmpty(this.dataSource.title)) {
-            			this.$message({type: 'warning', message: '请选择一个连接'});
-            			return;
-            		}
-            		this.$confirm(`确认删除连接"${this.dataSource.title}"?`, '提示', {
-        	          confirmButtonText: '确定',
-        	          cancelButtonText: '取消',
-        	          type: 'warning'
-        	        }).then(() => {
-    	        	  delete this.dataSourceList[this.dataSource.title];
-            		  this.dataSource = {};
-            		  this.saveDataSourceConfigToLocal();
-        	        });
-            	},
-            	testDataSourceConfig() {
-            		if(!this.newDataSourceFlag && util.isEmpty(this.dataSource.title)) {
-            			this.$message({type: 'warning', message: '请选择一个连接'});
-            			return;
-            		}
-            		this.testLoading = true;
-            		ajax.get('/table/testDataSource', this.dataSource).then(ret => {
-                        if(ret.data === 10000) {
-                        	this.$message({type: 'success', message: '连接测试通过'});
-                        }else {
-                        	this.$msgbox({type: 'error', title: '系统提示', message: ret.msg});
-                        }
-                        this.testLoading = false;
-                    }).catch((err) => {
-                    	this.testLoading = false;
-                    });
-            	},
-                refreshDataSource() {
-                    this.getTableList();
-                },
-                previewData() {
-                    if(Object.keys(this.selectedTable).length > 0) {
-                        ajax.post('/mock/common', this.selectedTable).then(ret => {
-                            this.mockData = ret.data;
-                        });
-                    }else {
-                        this.$message('Please select a table.');
-                    }
-                },
-                saveData() {
-                    this.$message('saveData');
-                },
-                downloadData() {
-                    this.$message('downloadData');
-                },
-                exportConfig() {
-                    util.download('config.json', this.data);
-                },
-                importConfig() {
-                    this.$message('importConfig');
-                },
-                getTableList() {
-                    if(!this.dataSource.title) {
-                        this.$message({type: 'warning', message: '请先配置数据源'})
-                        return;
-                    }
-                    this.tableList.length = 0;
-                    this.tabLoading = true;
-                    ajax.get('/table/list', this.dataSource).then(ret => {
-                        this.tableList = ret.data;
-                        this.tabLoading = false;
-                    }).catch((err) => {
-                        this.tabLoading = false;
-                    });
-                },
-             /*    getDBTypeList() {
-                	ajax.get('/code/map/simple/DBTYPE').then(ret => {
-                		this.dbTypeList = ret.data;
-                		console.log(this.dbTypeList);
-                	});
-                } */
-            },
-            mounted() {
-                console.log('vue mounted.');
-            },
-            created() {
-            	let dsCacheString = localStorage.getItem(this.DataMockerDataKey);
-            	if(dsCacheString) {
-            		this.dataSourceList = eval('('+Base64.decode(dsCacheString)+')');
-            	}
-            	/* this.getDBTypeList(); */
-                console.log('vue created.');
+    </el-dialog>
+    <el-dialog :title="'字段信息' + (showColumnInfoData[0] ? (' - ' + showColumnInfoData[0].tableName) : '')"
+               :visible.sync="showColumnInfoVisible">
+        <el-table :data="showColumnInfoData" size="mini" height="400">
+            <!-- <el-table-column v-for="(value,colName) in showColumnInfoData[0]" :key="colName" :property="colName" :label="colName" width="150"></el-table-column> -->
+            <el-table-column type="index" label="序号" :index="indexMethod"></el-table-column>
+            <el-table-column property="columnName" label="字段名" width="150"></el-table-column>
+            <el-table-column property="columnComment" label="字段说明" width="150"></el-table-column>
+            <el-table-column property="columnType" label="字段类型" width="150"></el-table-column>
+            <el-table-column property="columnLength" label="字段长度" width="150"></el-table-column>
+        </el-table>
+    </el-dialog>
+    <el-dialog :title="'字段配置 - ' + selectedTable.tableName" :visible.sync="showColumnConfigVisible">
+        <el-table :data="selectedTable.columns" size="mini" height="400">
+            <el-table-column type="expand">
+                <template slot-scope="props">
+                    <span>{{JSON.stringify(props.row, null, 2)}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column type="index" label="序号" :index="indexMethod"></el-table-column>
+            <el-table-column property="columnName" label="字段名" width="150"></el-table-column>
+            <el-table-column property="columnComment" label="字段说明" width="150"></el-table-column>
+            <el-table-column property="columnType" label="字段类型" width="150"></el-table-column>
+            <el-table-column property="columnLength" label="字段长度" width="150"></el-table-column>
+        </el-table>
+        <span slot="footer" class="dialog-footer">
+                <el-button type="info" @click="showColumnConfigVisible = false">重 置</el-button>
+                <el-button @click="showColumnConfigVisible = false">取 消</el-button>
+                <el-button type="primary" @click="showColumnConfigVisible = false">保 存</el-button>
+            </span>
+    </el-dialog>
+</div>
+</body>
+
+<script>
+    Vue.prototype.$ELEMENT = {size: 'small', zIndex: 3000};
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                DataMockerDataKey: '_DataMockerData_',
+                dataSourceList: {},
+                newDataSourceFlag: false,
+                showColumnConfigVisible: false,
+                showColumnInfoVisible: false,
+                showColumnInfoData: [],
+                btnDSLoading: false,
+                testLoading: false,
+                selectedTable: {},
+                mockData: [],
+                tableList: [],
+                showDataSourceForm: false,
+                dbTypeList: {},
+                dataSource: {title: null, type: null, driver: null, url: null, username: null, password: null}
             }
-        })
-    </script>
+        },
+        computed: {
+            // dataSourceString() {
+            //     return this.dataSource.title === null ? '未配置数据源' : `${this.dataSource.username} - ${this.dataSource.url}`;
+            // },
+            btnDSType() {
+                return util.isEmpty(this.dataSource.title) ? '' : 'primary';
+            },
+            btnDSIcon() {
+                return util.isEmpty(this.dataSource.title) ? 'el-icon-coin' : 'el-icon-success';
+            },
+            btnDSTitle() {
+                return util.isEmpty(this.dataSource.title) ? '连接数据源' : '已连接至：' + this.dataSource.title;
+            }
+        },
+        methods: {
+            inputUpdate(e) {
+                this.$forceUpdate();
+            },
+            changeDBType(dbType) {
+                let dt = this.dbTypeList[dbType];
+                if (this.newDataSourceFlag) {
+                    this.dataSource.driver = dt.attr1;
+                    this.dataSource.url = dt.attr2;
+                    this.dataSource.username = dt.attr4;
+                }
+            },
+            indexMethod(index) {
+                return index + 1;
+            },
+            handleNodeClick(data) {
+                this.mockData.length = 0;
+                this.selectedTable = data;
+            },
+            showColumnInfo(tab) {
+                this.showColumnInfoData = tab.columns;
+                this.showColumnInfoVisible = true;
+            },
+            changeDataSource(key) {
+                this.dataSource = Object.assign({}, this.dataSourceList[key]);
+            },
+            setDataSource() {
+                this.showDataSourceForm = true;
+            },
+            newDataSource() {
+                this.dataSource = {};
+                this.newDataSourceFlag = !this.newDataSourceFlag;
+            },
+            saveDataSourceConfig() {
+                if (this.newDataSourceFlag && this.dataSourceList.hasOwnProperty(this.dataSource.title)) {
+                    this.$message({type: 'warning', message: '该连接名称已存在'});
+                    return;
+                }
+                if (util.isNull(this.dataSource.title)) {
+                    this.$message({type: 'warning', message: '连接名称不能为空'});
+                    return;
+                }
+                this.dataSourceList[this.dataSource.title] = Object.assign({}, this.dataSource);
+                this.saveDataSourceConfigToLocal();
+                this.newDataSourceFlag = false;
+                this.showDataSourceForm = false;
+                this.getTableList();
+                if (this.newDataSourceFlag) this.$message({type: 'success', message: '保存成功'});
+            },
+            saveDataSourceConfigToLocal() {
+                var temp = Base64.encode(JSON.stringify(this.dataSourceList));
+                localStorage.setItem(this.DataMockerDataKey, temp);
+            },
+            delDataSourceConfig() {
+                if (util.isEmpty(this.dataSource.title)) {
+                    this.$message({type: 'warning', message: '请选择一个连接'});
+                    return;
+                }
+                this.$confirm(`确认删除连接"${this.dataSource.title}"?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    delete this.dataSourceList[this.dataSource.title];
+                    this.dataSource = {};
+                    this.saveDataSourceConfigToLocal();
+                });
+            },
+            testDataSourceConfig() {
+                if (!this.newDataSourceFlag && util.isEmpty(this.dataSource.title)) {
+                    this.$message({type: 'warning', message: '请选择一个连接'});
+                    return;
+                }
+                this.testLoading = true;
+                ajax.get('/table/testDataSource', this.dataSource).then(ret => {
+                    if (ret.data === 10000) {
+                        this.$message({type: 'success', message: '连接测试通过'});
+                    } else {
+                        this.$msgbox({type: 'error', title: '系统提示', message: ret.msg});
+                    }
+                    this.testLoading = false;
+                }).catch((err) => {
+                    this.testLoading = false;
+                });
+            },
+            refreshDataSource() {
+                this.getTableList();
+            },
+            configColumn() {
+                if (Object.keys(this.selectedTable).length > 0) {
+                    this.showColumnConfigVisible = true;
+                    // console.log(this.selectedTable);
+                } else {
+                    this.$message('Please select a table.');
+                }
+
+            },
+            previewData() {
+                if (Object.keys(this.selectedTable).length > 0) {
+                    ajax.post('/mock/common', this.selectedTable).then(ret => {
+                        this.mockData = ret.data;
+                    });
+                } else {
+                    this.$message('Please select a table.');
+                }
+            },
+            saveData() {
+                if (Object.keys(this.selectedTable).length > 0) {
+                    // {dataSource: this.dataSource, Table: this.selectedTable}
+                    console.log(this.selectedTable);
+                    ajax.post('/table/save', {dataSource: this.dataSource, table: this.selectedTable}).then(ret => {
+                        // console.log(ret.data);
+                    });
+                } else {
+                    this.$message('Please select a table.');
+                }
+            },
+            downloadData() {
+                this.$message('downloadData');
+            },
+            exportConfig() {
+                util.download('config.json', this.data);
+            },
+            importConfig() {
+                this.$message('importConfig');
+            },
+            getTableList() {
+                if (!this.dataSource.title) {
+                    this.$message({type: 'warning', message: '请先配置数据源'})
+                    return;
+                }
+                this.tableList.length = 0;
+                this.btnDSLoading = true;
+                ajax.get('/table/list', this.dataSource).then(ret => {
+                    this.tableList = ret.data;
+                    this.btnDSLoading = false;
+                }).catch((err) => {
+                    this.btnDSLoading = false;
+                });
+            },
+            getDBTypeList() {
+                ajax.get('/code/map/DBTYPE').then(ret => {
+                    this.dbTypeList = ret.data;
+                    // console.log(this.dbTypeList);
+                });
+            }
+        },
+        mounted() {
+            // console.log('vue mounted.');
+        },
+        created() {
+            let dsCacheString = localStorage.getItem(this.DataMockerDataKey);
+            if (dsCacheString) {
+                this.dataSourceList = eval('(' + Base64.decode(dsCacheString) + ')');
+            }
+            this.getDBTypeList();
+            // console.log('vue created.');
+        }
+    })
+</script>
+
 </html>
